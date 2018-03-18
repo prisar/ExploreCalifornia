@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace ExploreCalifornia
@@ -20,12 +21,29 @@ namespace ExploreCalifornia
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            if (env.IsDevelopment())
+            app.UseExceptionHandler("/error.html");
+
+            var configuration = new ConfigurationBuilder()
+                .AddEnvironmentVariables()
+                .Build();
+
+            if (configuration.GetValue<bool>("EnabledDeveloperExceptions"))
             {
                 app.UseDeveloperExceptionPage();
             }
 
+            //if (env.IsDevelopment())
+            //{
+            //    app.UseDeveloperExceptionPage();
+            //}
 
+            app.Use(async (context, next) =>
+            {
+                if (context.Request.Path.Value.Contains("invalid"))
+                    throw new Exception("ERROR");
+
+                await next();
+            });
 
             app.UseFileServer();
         }
