@@ -25,9 +25,10 @@ namespace ExploreCalifornia
 
             var configuration = new ConfigurationBuilder()
                 .AddEnvironmentVariables()
+                .AddJsonFile(env.ContentRootPath + "/config.json")
                 .Build();
 
-            if (configuration.GetValue<bool>("EnabledDeveloperExceptions"))
+            if (configuration.GetValue<bool>("FeatureToggles:EnableDeveloperExceptions"))
             {
                 app.UseDeveloperExceptionPage();
             }
